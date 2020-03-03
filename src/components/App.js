@@ -53,7 +53,7 @@ export default class App extends Component {
 
  };
  
- openPokeCard = (name) => {
+ getPokeDetails = (name) => {
    this.fetchPokeDetails(name);
  };
 
@@ -62,7 +62,6 @@ export default class App extends Component {
  };
  
  render() {
-  // const {pokeDetail} = this.state;
    return (
      <div className="App">
        <div className="header">
@@ -76,8 +75,13 @@ export default class App extends Component {
        <div id="main-content">
         {this.state.isCardOpen ? (
         <div className="poke-card-details info">
-          <img src={this.state.pokeDetail.sprites.front_default} alt="" />
+          <img className="spriteImage" src={this.state.pokeDetail.sprites.front_default} alt="" />
           <h2 className="pokeName">{this.state.pokeDetail.name}</h2>
+          <h3>Abilities:{this.state.pokeDetail.abilities.map(abilityObj => (
+            <li className="pokeAbility">{abilityObj.ability.name}</li>
+              )
+            )}
+          </h3>
           <button className="detailBtn" onClick={() => this.handleClose()}>close</button>
         </div>
         ) : (
@@ -87,7 +91,7 @@ export default class App extends Component {
              <li
                className="poke-card"
                key={poke.name}
-               onClick={() => this.openPokeCard(poke.name)}
+               onClick={() => this.getPokeDetails(poke.name)}
              >
                <h3>{poke.name}</h3>
                <button className="detailBtn">Details</button>
