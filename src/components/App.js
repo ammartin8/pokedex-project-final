@@ -1,77 +1,121 @@
 import React, { Component } from "react";
-import Header from "./Header";
-
 export default class App extends Component {
-  state = {
-    pokemon: {
-      results: [
-        {
-          name: "bulbasaur"
-        },
-        {
-          name: "ivysaur"
-        },
-        {
-          name: "Venusaur"
-        }
-      ]
-    }
-  };
+ state = {
+   offset: 0,
+   limit: 12,
+   pokemon: {
+     results: []
+   },
+   pokeDetail: {
+     name: "",
+     sprites: {},
+     abilities: []
+   },
+   isCardOpen: false
+ };
+ componentDidMount() {
+   this.fetchPokemon();
+ }
+ componentDidUpdate(prevProps, prevState) {
+   if (prevState.offset !== this.state.offset) {
+     this.fetchPokemon();
+   }
+ }
+ fetchPokemon = () => {
+   fetch(
+     `https://pokeapi.co/api/v2/pokemon/?offset=${this.state.offset}&limit=12`
+   )
+     .then(res => res.json())
+     .then(json => {
+       console.log(json);
+       this.setState({ pokemon: json });
+     });
+ };
+ update = num => {
+   this.setState(prevState => {
+     return { offset: prevState.offset + num };
+   });
+ };
+ 
+ // Todo:
+ /* 1. create function that open new div on click of pokecard
+ 2. fetch data on specific pokemon based on user input (click of card)
+ 3. Display data on new div
+ 4. create close button and close new div upon click of close button*/
+ fetchPokeDetails = (name) => {
+  fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
+     .then(res => res.json())
+     .then(json => {
+       console.log(json);
+       this.setState({ pokeDetail: json });
+       this.setState({isCardOpen: true})
+     });
 
-  componentDidMount() {
-    this.fetchPokemon();
-  }
+ };
+ 
+ openPokeCard = (name) => {
+   this.fetchPokeDetails(name);
+ };
 
-  fetchPokemon = async (
-    url = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=12"
-  ) => {
-    const res = await fetch(url);
-    const pokes = await res.json();
-    this.setState({ pokemon: pokes });
-    console.log(pokes);
-  };
-
-  next = () => {
-    if (!this.state.pokemon.next) return;
-    this.fetchPokemon(this.state.pokemon.next);
-    console.log("next");
-  };
-
-  previous = () => {
-    if (!this.state.pokemon.previous) return;
-    this.fetchPokemon(this.state.pokemon.previous);
-    console.log("prev");
-  };
-
-  render() {
-    return (
-      <div className="App">
-        <Header />
-
-        <div id="main-content">
-          <ul>
-            {this.state.pokemon.results.map(poke => (
-              <li className="poke-card" key={poke.name}>
-                <h3>{poke.name}</h3>
-              </li>
-            ))}
-          </ul>
-
-          <button id="previous" className="btn" onClick={this.previous}>
-            Previous
-          </button>
-          <button id="next" className="btn" onClick={this.next}>
-            Next
-          </button>
+ handleClose = () => {
+   this.setState({isCardOpen: false});
+ };
+ 
+ render() {
+  // const {pokeDetail} = this.state;
+   return (
+     <div className="App">
+       <div className="header">
+         <img
+           className="header-logo"
+           src="https://raw.githubusercontent.com/CodeLouisville/FSJS-Weekly-Challenges/master/Challenges/Week5/images/pokedex.png"
+           alt="pokedex logo"
+         />
+         <h1>Pok&eacute;dex</h1>
+       </div>
+       <div id="main-content">
+        {this.state.isCardOpen ? (
+        <div className="poke-card-details info">
+          <img src={this.state.pokeDetail.sprites.front_default} alt="" />
+          <h2 className="pokeName">{this.state.pokeDetail.name}</h2>
+          <button className="detailBtn" onClick={() => this.handleClose()}>close</button>
         </div>
-
-        <img
-          id="pikachu"
-          className="hvr-hang"
-          src="https://raw.githubusercontent.com/CodeLouisville/FSJS-Weekly-Challenges/master/Challenges/Week5/images/pikachu.png"
-          alt="Pikachu"
-        />
-      </div>
-    );
-  }
+        ) : (
+          <>
+         <ul>
+           {this.state.pokemon.results.map(poke => (
+             <li
+               className="poke-card"
+               key={poke.name}
+               onClick={() => this.openPokeCard(poke.name)}
+             >
+               <h3>{poke.name}</h3>
+               <button className="detailBtn">Details</button>
+             </li>
+           ))}
+         </ul>
+          
+         <button
+           id="previous"
+           className="btn"
+           onClick={() => this.update(-12)}
+         >
+           Previous
+         </button>
+         <button id="next" className="btn" onClick={() => this.update(12)}>
+           Next
+         </button>
+         </>
+        )
+           }
+       </div>
+       <img
+         id="pikachu"
+         className="hvr-hang"
+         src="https://raw.githubusercontent.com/CodeLouisville/FSJS-Weekly-Challenges/master/Challenges/Week5/images/pikachu.png"
+         alt="Pikachu"
+       />
+     </div>
+   );
+ }
 }

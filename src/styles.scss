@@ -160,3 +160,25 @@ li {
   animation-fill-mode: forwards;
   animation-direction: normal, alternate;
 }
+
+.poke-card-details {
+  background-color: white;
+  border-radius: 20px;
+  width: 250px;
+  height: auto;
+  margin: auto;
+  padding: 10px;
+}
+
+.detailBtn {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  padding: 5px;
+}
+
+h2 {
+  color: black;
+}
